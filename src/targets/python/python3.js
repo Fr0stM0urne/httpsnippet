@@ -21,6 +21,10 @@ module.exports = function (source, options) {
     code.push('import ssl')
   }
 
+  if (source.allHeaders['accept-encoding'] == 'gzip') {
+    code.push('import gzip')
+  }
+  
   code.blank()
 
   // Check which protocol to be used for the client connection
@@ -90,8 +94,14 @@ module.exports = function (source, options) {
     .push('res = conn.getresponse()')
     .push('data = res.read()')
     .blank()
-    .push('print(data.decode("utf-8"))')
-
+  
+  // Decode response
+  if (headers['accept-encoding'] == 'gzip') {
+    code.push('print(gzip.decompress(data).decode("utf-8"))')
+  } else {
+    code.push('print(data.decode("utf-8"))')
+  }
+  
   return code.join()
 }
 
