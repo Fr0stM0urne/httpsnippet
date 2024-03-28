@@ -1,5 +1,4 @@
 import http.client
-import gzip
 
 conn = http.client.HTTPConnection("mockbin.com")
 
