@@ -45,7 +45,7 @@ const HTTPSnippet = function (data) {
     entry.request.headersSize = 0
     entry.request.postData.size = 0
 
-    // Add response 
+    // Add response
     if (entry.response) {
       entry.request.response = entry.response
       entry.request.response.headers = entry.request.response.headers || []
