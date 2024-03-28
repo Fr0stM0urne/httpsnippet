@@ -22,9 +22,7 @@ module.exports = function (source, options) {
     code.push('import ssl')
   }
 
-  if (response && response.headersObj['content-encoding'] === 'gzip') {
-    code.push('import gzip')
-  }
+  code.push('import gzip')
 
   code.blank()
 
@@ -97,11 +95,10 @@ module.exports = function (source, options) {
     .blank()
 
   // Decode response
-  if (response && response.headersObj['content-encoding'] === 'gzip') {
-    code.push('print(gzip.decompress(data).decode("utf-8"))')
-  } else {
-    code.push('print(data.decode("utf-8"))')
-  }
+  code.push("if res.headers['content-encoding'] == 'gzip':")
+  code.push('    print(gzip.decompress(data).decode("utf-8"))')
+  code.push('else:')
+  code.push('    print(data.decode("utf-8"))')
 
   return code.join()
 }
