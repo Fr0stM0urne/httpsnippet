@@ -14,6 +14,7 @@ const CodeBuilder = require('../../helpers/code-builder')
 
 module.exports = function (source, options) {
   const code = new CodeBuilder()
+  const response = source.response
   // Start Request
   code.push('import http.client')
 
@@ -21,7 +22,7 @@ module.exports = function (source, options) {
     code.push('import ssl')
   }
 
-  if (source.allHeaders['accept-encoding'] == 'gzip') {
+  if (response && response.headersObj['content-encoding'] == 'gzip') {
     code.push('import gzip')
   }
   
@@ -96,7 +97,7 @@ module.exports = function (source, options) {
     .blank()
   
   // Decode response
-  if (headers['accept-encoding'] == 'gzip') {
+  if (response && response.headersObj['content-encoding'] == 'gzip') {
     code.push('print(gzip.decompress(data).decode("utf-8"))')
   } else {
     code.push('print(data.decode("utf-8"))')
