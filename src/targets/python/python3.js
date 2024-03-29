@@ -14,7 +14,7 @@ const CodeBuilder = require('../../helpers/code-builder')
 
 module.exports = function (source, options) {
   const code = new CodeBuilder()
-  const response = source.response
+
   // Start Request
   code.push('import http.client')
 
