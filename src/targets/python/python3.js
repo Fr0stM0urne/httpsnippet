@@ -14,7 +14,11 @@ const CodeBuilder = require('../../helpers/code-builder')
 
 module.exports = function (source, options) {
   const code = new CodeBuilder()
-  const response = source.response
+
+  // Response of the corresponding request. Potentially useful for future development.
+  // Only received when the input file is a HAR file.
+  // const response = source.response
+
   // Start Request
   code.push('import http.client')
 
@@ -22,7 +26,9 @@ module.exports = function (source, options) {
     code.push('import ssl')
   }
 
-  code.push('import gzip')
+  if (source.allHeaders['accept-encoding'] === 'gzip') {
+    code.push('import gzip')
+  }
 
   code.blank()
 
@@ -95,10 +101,11 @@ module.exports = function (source, options) {
     .blank()
 
   // Decode response
-  code.push("if res.headers['content-encoding'] == 'gzip':")
-  code.push('    print(gzip.decompress(data).decode("utf-8"))')
-  code.push('else:')
-  code.push('    print(data.decode("utf-8"))')
+  if (headers['accept-encoding'] === 'gzip') {
+    code.push('print(gzip.decompress(data).decode("utf-8"))')
+  } else {
+    code.push('print(data.decode("utf-8"))')
+  }
 
   return code.join()
 }
