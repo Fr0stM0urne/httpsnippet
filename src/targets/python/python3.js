@@ -11,13 +11,10 @@
 'use strict'
 
 const CodeBuilder = require('../../helpers/code-builder')
+const helpers = require('../../helpers/headers')
 
 module.exports = function (source, options) {
   const code = new CodeBuilder()
-
-  // Response of the corresponding request. Potentially useful for future development.
-  // Only received when the input file is a HAR file.
-  // const response = source.response
 
   // Start Request
   code.push('import http.client')
@@ -26,7 +23,10 @@ module.exports = function (source, options) {
     code.push('import ssl')
   }
 
-  if (source.allHeaders['accept-encoding'] === 'gzip') {
+  const mayBeGzipped = helpers.hasHeader(source.allHeaders, 'accept-encoding') &&
+    helpers.getHeader(source.allHeaders, 'accept-encoding').includes('gzip')
+
+  if (mayBeGzipped) {
     code.push('import gzip')
   }
 
@@ -101,8 +101,11 @@ module.exports = function (source, options) {
     .blank()
 
   // Decode response
-  if (headers['accept-encoding'] === 'gzip') {
-    code.push('print(gzip.decompress(data).decode("utf-8"))')
+  if (mayBeGzipped) {
+    code.push("if res.headers['content-encoding'] == 'gzip':")
+    code.push('    print(gzip.decompress(data).decode("utf-8"))')
+    code.push('else:')
+    code.push('    print(data.decode("utf-8"))')
   } else {
     code.push('print(data.decode("utf-8"))')
   }
